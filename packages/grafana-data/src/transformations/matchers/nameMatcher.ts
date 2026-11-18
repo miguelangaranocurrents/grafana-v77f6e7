@@ -115,8 +115,12 @@ function fieldNameFallback(fields: Set<string>) {
       );
     };
   } else if (fields.has('Time') || fields.has('time')) {
+    // Only the legacy time field itself (named "time", any casing) should match. Other time-typed
+    // fields (e.g. a second "created" timestamp column) must not be swept up by this fallback.
     fallback = (field: Field, frame: DataFrame) => {
-      return frame.meta?.typeVersion == null && field.type === FieldType.time;
+      return (
+        frame.meta?.typeVersion == null && field.type === FieldType.time && field.name.toLowerCase() === 'time'
+      );
     };
   }
 
